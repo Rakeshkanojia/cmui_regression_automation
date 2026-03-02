@@ -16,8 +16,8 @@ export default defineConfig({
   // Fail the build on CI if you accidentally left test.only in the source code
   forbidOnly: !!process.env.CI,
   
-  // Retry on CI only
-  retries: process.env.CI ? 2 : 0,
+  // Retry on CI only - reduced to 1 for faster debugging
+  retries: process.env.CI ? 1 : 0,
   
   // Number of parallel workers
   workers: process.env.CI ? 1 : undefined,
@@ -38,11 +38,11 @@ export default defineConfig({
     // Base URL for your application
     baseURL: process.env.BASE_URL || 'https://staging.itsacheckmate.com',
     
-    // Collect trace when retrying the failed test
-    trace: 'on-first-retry',
+    // Collect trace - always on for CI debugging
+    trace: process.env.CI ? 'on' : 'on-first-retry',
     
-    // Take screenshot on failure
-    screenshot: 'only-on-failure',
+    // Take screenshot - on failure, or on all steps in CI for debugging
+    screenshot: process.env.CI ? 'on' : 'only-on-failure',
     
     // Record video on failure
     video: 'retain-on-failure',
