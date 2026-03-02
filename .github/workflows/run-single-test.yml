@@ -1,0 +1,62 @@
+name: Run Single Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_file:
+        description: 'Test file to run (e.g., test-case-006)'
+        required: true
+        type: choice
+        options:
+          - test-case-001
+          - test-case-002
+          - test-case-005
+          - test-case-006
+          - test-case-007
+          - test-case-008
+      browser:
+        description: 'Browser to run test on'
+        required: true
+        type: choice
+        default: 'chromium'
+        options:
+          - chromium
+          - firefox
+          - webkit
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps ${{ inputs.browser }}
+      
+    - name: Create .env file
+      run: |
+        echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
+        echo "USER_EMAIL=${{ secrets.USER_EMAIL }}" >> .env
+        echo "USER_PASSWORD=${{ secrets.USER_PASSWORD }}" >> .env
+        echo "TEST_LOCATION_ID=${{ secrets.TEST_LOCATION_ID }}" >> .env
+      
+    - name: Run selected test
+      run: npx playwright test tests/${{ inputs.test_file }} --project=${{ inputs.browser }}
+      
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results-${{ inputs.test_file }}
+        path: test-results/
+        retention-days: 30
