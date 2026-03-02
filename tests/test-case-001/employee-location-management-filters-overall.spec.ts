@@ -36,10 +36,12 @@ test('TC-001: Employee Location Management - Filters Overall', async ({ page }) 
   
   // Wait for page to load after login
   await page.waitForLoadState('networkidle');
-  await page.waitForTimeout(3000);
+  await page.waitForTimeout(5000);
   
   // Step 2: Navigate to Location Management
-  await page.getByLabel('Location Management').getByRole('link').click();
+  const locationLink = page.getByLabel('Location Management').getByRole('link');
+  await locationLink.waitFor({ state: 'visible', timeout: 30000 });
+  await locationLink.click();
   await expect(page).toHaveURL(/.*location/);
   
   // Test Filter 1: Location Name Filter

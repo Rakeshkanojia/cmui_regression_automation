@@ -8,7 +8,7 @@ export default defineConfig({
   testDir: './tests',
   
   // Maximum time one test can run
-  timeout: 60 * 1000,
+  timeout: process.env.CI ? 120 * 1000 : 60 * 1000,
   
   // Run tests in parallel
   fullyParallel: true,
