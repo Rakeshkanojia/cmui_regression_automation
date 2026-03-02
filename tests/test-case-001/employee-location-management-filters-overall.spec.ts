@@ -17,16 +17,11 @@ test('TC-001: Employee Location Management - Filters Overall', async ({ page }) 
   await page.getByRole('textbox', { name: 'Email Address' }).click();
   await page.getByRole('textbox', { name: 'Email Address' }).fill(process.env.USER_EMAIL!);
   
-  // Fill password - use type() method for special characters
+  // Fill password - use pressSequentially for special characters
   const passwordInput = page.locator('input[type="password"]');
   await passwordInput.click();
-  
-  // Clear any existing value first
-  await passwordInput.press('Control+A');
-  await passwordInput.press('Backspace');
-  
-  // Type password character by character
-  await passwordInput.type(process.env.USER_PASSWORD!, { delay: 100 });
+  await passwordInput.clear();
+  await passwordInput.pressSequentially(process.env.USER_PASSWORD!, { delay: 50 });
   
   // Verify password was entered
   await page.waitForTimeout(1000);

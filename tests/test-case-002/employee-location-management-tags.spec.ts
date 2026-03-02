@@ -17,7 +17,8 @@ test('TC-002: Employee Location Management - Tags and Collections', async ({ pag
   // Fill password using correct selector
   const passwordInput = page.locator('input[type="password"]');
   await passwordInput.click();
-  await passwordInput.type(process.env.USER_PASSWORD!, { delay: 100 });
+  await passwordInput.clear();
+  await passwordInput.pressSequentially(process.env.USER_PASSWORD!, { delay: 50 });
   
   await page.waitForTimeout(1000);
   await page.getByRole('button', { name: 'Sign in' }).click();
