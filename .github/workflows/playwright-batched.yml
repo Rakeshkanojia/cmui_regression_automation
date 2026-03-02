@@ -53,7 +53,7 @@ jobs:
       run: npm run dashboard:generate
       
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: playwright-results-shard-${{ matrix.shard }}
@@ -61,7 +61,7 @@ jobs:
         retention-days: 30
         
     - name: Upload Dashboard
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-dashboard-shard-${{ matrix.shard }}
@@ -86,7 +86,7 @@ jobs:
       run: npm ci
       
     - name: Download all artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: all-results
         
@@ -99,7 +99,7 @@ jobs:
       run: npm run dashboard:generate
       
     - name: Upload Final Dashboard
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: final-test-dashboard
