@@ -1,0 +1,36 @@
+{
+  "name": "qa-automation-framework",
+  "version": "1.0.0",
+  "description": "Playwright TypeScript automation framework for manual test cases",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:specific": "playwright test --grep",
+    "codegen": "playwright codegen",
+    "report": "playwright show-report",
+    "install:browsers": "playwright install",
+    "allure:generate": "allure generate allure-results --clean -o allure-report",
+    "allure:open": "allure open allure-report",
+    "allure:dashboard": "npm run allure:generate && npm run allure:open",
+    "dashboard:generate": "node generate-dashboard.js",
+    "dashboard": "node generate-dashboard.js && open test-results/dashboard.html",
+    "test:dashboard": "playwright test --workers=1 && npm run dashboard"
+  },
+  "keywords": [
+    "playwright",
+    "automation",
+    "testing"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.10.0",
+    "allure-commandline": "^2.37.0",
+    "allure-playwright": "^3.5.0",
+    "dotenv": "^16.3.1",
+    "typescript": "^5.3.0"
+  }
+}

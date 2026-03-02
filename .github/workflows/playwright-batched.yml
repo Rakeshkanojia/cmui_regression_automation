@@ -1,0 +1,107 @@
+name: Playwright Tests (Batched Execution)
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+    inputs:
+      batch_size:
+        description: 'Number of tests to run in each batch'
+        required: false
+        default: '10'
+
+jobs:
+  test:
+    timeout-minutes: 120
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Run tests in 3 parallel batches - adjust based on your needs
+        shard: [1, 2, 3]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps chromium
+      
+    - name: Create .env file
+      run: |
+        echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
+        echo "USER_EMAIL=${{ secrets.USER_EMAIL }}" >> .env
+        echo "USER_PASSWORD=${{ secrets.USER_PASSWORD }}" >> .env
+        echo "TEST_LOCATION_NAME=${{ secrets.TEST_LOCATION_NAME }}" >> .env
+        echo "TEST_LOCATION_ID=${{ secrets.TEST_LOCATION_ID }}" >> .env
+      
+    - name: Run Playwright tests (Shard ${{ matrix.shard }})
+      run: npx playwright test --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+      
+    - name: Generate Dashboard
+      if: always()
+      run: npm run dashboard:generate
+      
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-results-shard-${{ matrix.shard }}
+        path: test-results/
+        retention-days: 30
+        
+    - name: Upload Dashboard
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-dashboard-shard-${{ matrix.shard }}
+        path: test-results/dashboard.html
+        retention-days: 30
+
+  # Merge all test results and create final dashboard
+  merge-reports:
+    if: always()
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: all-results
+        
+    - name: Merge test results
+      run: |
+        mkdir -p merged-results
+        cp -r all-results/playwright-results-shard-*/* merged-results/ || true
+        
+    - name: Generate Final Dashboard
+      run: npm run dashboard:generate
+      
+    - name: Upload Final Dashboard
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: final-test-dashboard
+        path: test-results/dashboard.html
+        retention-days: 30
