@@ -1,10 +1,11 @@
 name: Playwright Tests (Batched Execution)
 
 on:
-  push:
-    branches: [ main, master, develop ]
-  pull_request:
-    branches: [ main, master, develop ]
+  # Disabled auto-run on push/PR - use manual trigger only until tests are optimized for CI
+  # push:
+  #   branches: [ main, master, develop ]
+  # pull_request:
+  #   branches: [ main, master, develop ]
   workflow_dispatch:
     inputs:
       batch_size:
